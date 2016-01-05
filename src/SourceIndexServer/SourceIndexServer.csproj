@@ -349,6 +349,7 @@
     <Content Include="Global.asax" />
     <Content Include="header.html" />
     <Content Include="index.html" />
+    <Content Include="content\jb_bg.png" />
     <Content Include="overview.html" />
     <Content Include="packages.config">
       <SubType>Designer</SubType>

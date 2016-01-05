@@ -19,8 +19,8 @@ h1 {
 
 pre {
     font-family: Consolas, 'Courier New', 'Andale Mono', 'Lucida Console', monospace;
-    font-size: 12pt;
-    line-height: 125%;
+    font-size: 11pt;
+    line-height: 120%;
     tab-size: 4;
 }
 
@@ -491,7 +491,7 @@ a i {
 .rH {
     margin-right: 0px;
     padding: 8px;
-    background-color: #68217A;
+    background-color: #000;
     color: white;
 }
 
@@ -533,10 +533,23 @@ a i {
 }
 
 .headerBody {
-    background-color: #68217A;
+    background-color: #000;
+    background-image: url('content/jb_bg.png');
+    background-size: 1794px 352px;
+    background-repeat: repeat-x;
     margin: 0px;
     padding: 0px;
     border-width: 0px;
+}
+
+@media
+only screen and (min--moz-device-pixel-ratio: 2),
+only screen and (-o-min-device-pixel-ratio: 2/1),
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (min-device-pixel-ratio: 2) {
+    .headerBody {
+        background-size: 897px 176px;
+    }
 }
 
 #dotnetLogo {
@@ -574,19 +587,19 @@ a i {
 }
 
 #logoText {
-    background-image: url(content/icons/microsoftlogo.png);
+    /*background-image: url(content/icons/microsoftlogo.png);*/
     background-repeat: no-repeat;
     background-position: 0px 22px;
     background-clip: border-box;
     color: white;
     font-size: 20px;
-    margin-left: 16px;
+    margin-left: 10px;
     margin-top: 0px;
     margin-right: 0px;
     margin-bottom: 0px;
     padding-top: 14px;
     padding-bottom: 2px;
-    padding-left: 95px;
+    /*padding-left: 95px;*/
     padding-right: 0px;
     vertical-align: top;
     display: inline-block;
@@ -861,7 +874,7 @@ ol a, ol a:link, ol a:hover, ol a:focus, ol a:active,
 .tabChannel {
     margin: 0px;
     padding: 0px;
-    background-color: #68217A;
+    background-color: #000;
 }
 
 .activeTab {
@@ -874,7 +887,7 @@ ol a, ol a:link, ol a:hover, ol a:focus, ol a:active,
 }
 
 .inactiveTab {
-    background-color: #68217A;
+    background-color: #000;
     color: white;
     padding-left: 16px;
     padding-top: 6px;
