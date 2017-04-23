@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.SourceBrowser.Common;
@@ -88,7 +89,7 @@ namespace Microsoft.SourceBrowser.HtmlGenerator
             }
         }
 
-        public void FinalizeProjects(bool emitAssemblyList, Folder<Project> solutionExplorerRoot = null)
+        public void FinalizeProjects(bool emitAssemblyList, Federation federation, Folder<Project> solutionExplorerRoot = null)
         {
             SortProcessedAssemblies();
             WriteSolutionExplorer(solutionExplorerRoot);
@@ -97,7 +98,7 @@ namespace Microsoft.SourceBrowser.HtmlGenerator
             CreateProjectMap();
             CreateReferencingProjectLists();
             WriteAggregateStats();
-            DeployFilesToRoot(SolutionDestinationFolder, emitAssemblyList);
+            DeployFilesToRoot(SolutionDestinationFolder, emitAssemblyList, federation);
 
             if (emitAssemblyList)
             {
@@ -294,81 +295,12 @@ namespace Microsoft.SourceBrowser.HtmlGenerator
                 });
         }
 
-        private void DeployFilesToRoot(string destinationFolder, bool emitAssemblyList)
+        private void DeployFilesToRoot(
+            string destinationFolder,
+            bool emitAssemblyList,
+            Federation federation)
         {
             Markup.WriteReferencesNotFoundFile(destinationFolder);
-
-            string sourcePath = Assembly.GetEntryAssembly().Location;
-            sourcePath = Path.GetDirectoryName(sourcePath);
-            string basePath = sourcePath;
-            sourcePath = Path.Combine(sourcePath, @"Web");
-            if (!Directory.Exists(sourcePath))
-            {
-                return;
-            }
-
-            sourcePath = Path.GetFullPath(sourcePath);
-            FileUtilities.CopyDirectory(sourcePath, destinationFolder);
-
-            StampOverviewHtmlWithDate(destinationFolder);
-            if (emitAssemblyList) ToggleSolutionExplorerOff(destinationFolder);
-
-            DeployBin(basePath, destinationFolder);
-        }
-
-        private void StampOverviewHtmlWithDate(string destinationFolder)
-        {
-            var overviewHtml = Path.Combine(destinationFolder, "overview.html");
-            if (File.Exists(overviewHtml))
-            {
-                var text = File.ReadAllText(overviewHtml);
-                text = StampOverviewHtmlText(text);
-                File.WriteAllText(overviewHtml, text);
-            }
-        }
-
-        private string StampOverviewHtmlText(string text)
-        {
-            text = text.Replace("$(Date)", DateTime.Today.ToString("MMMM d", CultureInfo.InvariantCulture));
-            return text;
-        }
-
-        private void ToggleSolutionExplorerOff(string destinationFolder)
-        {
-            var scriptsJs = Path.Combine(destinationFolder, "scripts.js");
-            if (File.Exists(scriptsJs))
-            {
-              var text = File.ReadAllText(scriptsJs);
-              text = text.Replace("/*USE_SOLUTION_EXPLORER*/true/*USE_SOLUTION_EXPLORER*/", "false");
-              File.WriteAllText(scriptsJs, text);
-            }
-        }
-
-        private void DeployBin(string sourcePath, string destinationFolder)
-        {
-            var files = new[]
-            {
-                "Microsoft.SourceBrowser.Common.dll",
-                "Microsoft.SourceBrowser.SourceIndexServer.dll",
-                "Microsoft.Web.Infrastructure.dll",
-                "Newtonsoft.Json.dll",
-                "System.Net.Http.Formatting.dll",
-                "System.Web.Helpers.dll",
-                "System.Web.Http.dll",
-                "System.Web.Http.WebHost.dll",
-                "System.Web.Mvc.dll",
-                "System.Web.Razor.dll",
-                "System.Web.WebPages.dll",
-                "System.Web.WebPages.Deployment.dll",
-                "System.Web.WebPages.Razor.dll",
-            };
-
-            foreach (var file in files)
-            {
-                FileUtilities.CopyFile(
-                    Path.Combine(sourcePath, file),
-                    Path.Combine(destinationFolder, "bin", file));
-            }
         }
 
         public void CreateProjectMap(string outputPath = null)

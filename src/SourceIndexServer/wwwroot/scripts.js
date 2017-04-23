@@ -4,8 +4,7 @@ var useSolutionExplorer = /*USE_SOLUTION_EXPLORER*/true/*USE_SOLUTION_EXPLORER*/
 var anchorSplitChar = ",";
 
 var externalUrlMap = [
-    "http://referencesource.microsoft.com/",
-    "http://source.roslyn.io/"
+    /*EXTERNAL_URL_MAP*/"https://referencesource.microsoft.com/", "http://source.roslyn.io/"/*EXTERNAL_URL_MAP*/
 ];
 
 var supportedFileExtensions = [
@@ -332,7 +331,7 @@ function rewriteExternalLink(link) {
         link.target = "_top";
     }
 
-    if (link.hash.length == 17) {
+    if (link.hash && link.hash.length == 17) {
         link.onclick = function () {
             var filePath = top.s.location.pathname.slice(1);
             filePath = getDisplayableFileName(filePath);

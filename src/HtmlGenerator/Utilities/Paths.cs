@@ -55,7 +55,7 @@ namespace Microsoft.SourceBrowser.HtmlGenerator
             }
         }
 
-        public static void PrepareDestinationFolder()
+        public static void PrepareDestinationFolder(bool forceOverwrite = false)
         {
             if (!Configuration.CreateFoldersOnDisk &&
                 !Configuration.WriteDocumentsToDisk &&
@@ -66,31 +66,40 @@ namespace Microsoft.SourceBrowser.HtmlGenerator
 
             if (Directory.Exists(SolutionDestinationFolder))
             {
-                Log.Write(string.Format("Warning, {0} will be deleted! Are you sure? (y/n)", SolutionDestinationFolder), ConsoleColor.Red);
-                if (Console.ReadKey().KeyChar != 'y')
+                if (!forceOverwrite)
                 {
-                    if (!File.Exists(Paths.ProcessedAssemblies))
-                    {
-                        Environment.Exit(0);
-                    }
-
-                    Log.Write("Would you like to continue previously aborted index operation where it left off?", ConsoleColor.Green);
+                    Log.Write(string.Format("Warning, {0} will be deleted! Are you sure? (y/n)", SolutionDestinationFolder), ConsoleColor.Red);
                     if (Console.ReadKey().KeyChar != 'y')
                     {
-                        Environment.Exit(0);
+                        if (!File.Exists(Paths.ProcessedAssemblies))
+                        {
+                            Environment.Exit(0);
+                        }
+
+                        Log.Write("Would you like to continue previously aborted index operation where it left off?", ConsoleColor.Green);
+                        if (Console.ReadKey().KeyChar != 'y')
+                        {
+                            Environment.Exit(0);
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                     else
                     {
-                        return;
+                        Console.WriteLine();
                     }
-                }
-                else
-                {
-                    Console.WriteLine();
                 }
 
                 Log.Write("Deleting " + SolutionDestinationFolder);
-                Directory.Delete(SolutionDestinationFolder, recursive: true);
+                try
+                {
+                    Directory.Delete(SolutionDestinationFolder, recursive: true);
+                }
+                catch (Exception)
+                {
+                }
             }
 
             Directory.CreateDirectory(SolutionDestinationFolder);
@@ -167,7 +176,17 @@ namespace Microsoft.SourceBrowser.HtmlGenerator
                 .Select(SanitizeFolder)
                 .ToArray());
 
-            result = Path.Combine(result, Path.GetFileName(document.FilePath));
+            string fileName;
+            if (document.FilePath != null)
+            {
+                fileName = Path.GetFileName(document.FilePath);
+            }
+            else
+            {
+                fileName = document.Name;
+            }
+
+            result = Path.Combine(result, fileName);
 
             return result;
         }
